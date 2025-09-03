@@ -1,8 +1,5 @@
 import os
 
-
-
-
 def AnalyseFile(file, capture):
 
     
@@ -58,7 +55,7 @@ def AnalyseFile(file, capture):
                 else:    print("!!!!!!!!!!!!!!!!!!!We dont have that YET!!!!!!!!!!!!!!!!!!!")
 
             if packet_counter == 0:
-                print("\nNo more packets.")
+                print("\nNo  packets.")
            
 
         except Exception as e:
@@ -76,6 +73,7 @@ def ARP(packet):
 
     if packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4:
         print("IT IS GRATITIOUS!")
+
     
 
 
