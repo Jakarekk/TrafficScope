@@ -1,6 +1,6 @@
 import os
 
-def AnalyseFile(file, capture):
+def analyse_file(file, capture):
 
     
     print(f"Checking the file: {file}")
@@ -41,13 +41,13 @@ def AnalyseFile(file, capture):
                 elif 'UDP' in packet:
                      UDP(packet)
                 elif 'DNS' in packet:
-                     GenericProtocolAnalyser(packet, 'DNS')
+                     analyse_generic_protocol(packet, 'DNS')
                 elif 'NBNS' in packet:
-                     GenericProtocolAnalyser(packet, 'NBNS')
+                     analyse_generic_protocol(packet, 'NBNS')
                 elif 'MDNS' in packet:
-                     GenericProtocolAnalyser(packet, 'MDNS')
+                     analyse_generic_protocol(packet, 'MDNS')
                 elif 'LMNR' in packet:
-                     GenericProtocolAnalyser(packet, 'LMNR')
+                     analyse_generic_protocol(packet, 'LMNR')
 
                 
                 
@@ -153,7 +153,7 @@ def ETH(packet):
     print(f"Type: {packet.eth.type}")
 
 
-def GenericProtocolAnalyser(packet, name):
+def analyse_generic_protocol(packet, name):
     proto_layer = packet[name.lower()]
     
     print(f"\t ID: {proto_layer.id}")

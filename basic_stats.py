@@ -2,7 +2,7 @@ import os
 from collections import Counter
 
 
-def HowMany(file, capture):
+def count_all_packets(file, capture):
 
     packet_counter = 0
 
@@ -12,7 +12,7 @@ def HowMany(file, capture):
     print(f"Found {packet_counter} packets")
 
 
-def HowManySpecific(file, capture):
+def count_packets_by_protocol(file, capture):
 
     protocol_counter = Counter()
    

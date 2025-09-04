@@ -3,7 +3,7 @@ from collections import defaultdict
 import pandas as pd
 import time
 
-import FileAnalyse
+import file_analyse
 
 
 
@@ -14,19 +14,13 @@ pd.set_option('display.max_colwidth', None)
 
 
 
-def ARPdata(capture):
+def extract_arp_data(capture):
 
     databaseARP = defaultdict(list)
-
-    timer1 = time.perf_counter()
-    timer2 = 0.0
-    interval = 1.0
     founds = 0
-    alert = False
-
+    
     try:
         packet_counter = 0
-        timer2 = time.perf_counter()
         for packet in capture:
             packet_counter += 1
             if 'ARP' in packet: 
@@ -41,19 +35,11 @@ def ARPdata(capture):
                     databaseARP['Gratitious?'].append('1')
                 else:
                     databaseARP['Gratitious?'].append('0')
-            if timer2 - timer1 >= interval:
-                   
-                    if (founds > 50 and founds < 200):
-                        print("There's a possible issue. Alarming amount of ARP packets")
-                        alert = True
-                    elif founds > 200:
-                        print("The device is probalby being attacked")
-                        alert = True
-                        founds = 0
-                        timer1 = time.perf_counter()
-
-        if alert == False:
-             print("The amount of ARP packets is normal")
+        prop = (founds/packet_counter) * 100
+        if prop > 10 and prop < 20:
+            print("The amount of ARP is alarming")
+        elif prop > 20:
+            print("WAY TOU MUCH ARP!!!!")
 
     except Exception as e:
         print(f"\nError??: {e}")
@@ -68,7 +54,7 @@ def ARPdata(capture):
     
 
 
-def GratitiousFrequency(arp_database):
+def check_for_unsolicited_arp(arp_database):
   
     if not arp_database['Operation']:
         print("No packets")
@@ -105,7 +91,7 @@ def GratitiousFrequency(arp_database):
     #print(pending_requests)
     
 
-def FalseARP(arp_database):
+def detect_arp_spoofing(arp_database):
 
     if not arp_database.get('Operation'):
         print("No packets")

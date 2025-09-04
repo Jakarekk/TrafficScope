@@ -21,9 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ARPcheck.py" />
-    <Compile Include="BasicStats.py" />
-    <Compile Include="FileAnalyse.py" />
+    <Compile Include="arp_check.py" />
+    <Compile Include="basic_stats.py" />
+    <Compile Include="file_analyse.py" />
     <Compile Include="TrafficScope.py" />
   </ItemGroup>
   <ItemGroup>
