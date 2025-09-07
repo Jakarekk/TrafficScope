@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="arp_check.py" />
     <Compile Include="basic_stats.py" />
+    <Compile Include="capture.py" />
     <Compile Include="file_analyse.py" />
     <Compile Include="TrafficScope.py" />
   </ItemGroup>

@@ -2,23 +2,23 @@ import os
 from collections import Counter
 
 
-def count_all_packets(file, capture):
+def count_all_packets(captured_packets):
 
     packet_counter = 0
 
-    for packet in capture:
+    for packet in captured_packets:
         packet_counter +=1
 
     print(f"Found {packet_counter} packets")
 
 
-def count_packets_by_protocol(file, capture):
+def count_packets_by_protocol(captured_packets):
 
     protocol_counter = Counter()
    
-    for packet in capture:
+    for packet in captured_packets:
       
-        protocol_names = packet.highest_layer
+        protocol_names = packet['protocol']
         protocol_counter[protocol_names] += 1
        
     for protocol, count in protocol_counter.items():

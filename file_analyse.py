@@ -1,167 +1,103 @@
-import os
-
-def analyse_file(file, capture):
-
+def arp(packet):
+    op_code = packet.arp.opcode
+    operation_desc = 'Request' if op_code == '1' else 'Reply' if op_code == '2' else 'Unknown operation'
     
-    print(f"Checking the file: {file}")
+    arp_data = {
+        'protocol': 'ARP',
+        'operation': f"{op_code} ({operation_desc})",
+        'sender_mac': packet.arp.src_hw_mac,
+        'sender_ip': packet.arp.src_proto_ipv4,
+        'target_mac': packet.arp.dst_hw_mac,
+        'target_ip': packet.arp.dst_proto_ipv4,
+        'gratuitous': packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4
+    }
+    return arp_data
 
-    if not os.path.exists(file):
-        print("Error: Theres no file there!")
-    else:
-        print("We have the file")
-        try:
-          
+def icmp(packet):
+    Type_map = { "3": "Destination unreachable", "4": "Source quench", "11": "Time Exceeded", "12": "Parameter problem", "8": "Echo request", "0": "Echo reply" }
+    Code_map = {
+        "3": {"0": "Net is unreachable", "1": "Host is unreachable", "2": "Protocol is unreachable", "3": "Port is unreachable"},
+        "5": {"0": "Redirect for network", "1": "Redirect for host", "2": "Redirect for type of service and network", "3": "Redirect for type of service and host"},
+        "11": {"0": "TTL exceeded", "1": "Fragment reassembly time exceeded"}, "12": {"0": "Pointer indicates error", "1": "Missing required option", "2": "Bad length"},
+        "8": {"0": "Echo request"}, "0": {"0": "Echo reply"}
+    }
+    
+    icmp_type = packet.icmp.type
+    icmp_code = packet.icmp.code
+    
+    icmp_data = {
+        'protocol': 'ICMP',
+        'type': icmp_type,
+        'type_description': Type_map.get(icmp_type, "Unknown type"),
+        'code': icmp_code,
+        'code_description': Code_map.get(icmp_type, {}).get(icmp_code, "No description"),
+        'checksum_status': packet.icmp.checksum_status
+    }
+    
+    if hasattr(packet.icmp, 'ident'):
+        icmp_data['identifier'] = packet.icmp.ident
+        icmp_data['sequence_number'] = packet.icmp.seq
         
-            packet_counter = 0
+    return icmp_data
 
-            print("Just a basic WHATS IN MY FILE!!??")
-            for packet in capture:
-                packet_counter += 1
-                print(f"Packet nr {packet_counter}: {packet.highest_layer}")
-                if 'ARP' in packet:
-                    ARP(packet)
-                elif 'ICMP' in packet:
-                     ICMP(packet)
-                elif 'ETH' in packet:
-                     ETH(packet)
-
-                elif 'TCP' in packet:
-                     if packet.highest_layer == 'TLS':
-                        print("TLS (over TCP)")
-                        TCP(packet)
-                     
-                     elif packet.highest_layer == 'DATA':
-                        print( "Unknown data - DATA")
-                        TCP(packet)
-                     else:
-                         TCP(packet)
-
-                elif 'IGMP' in packet:
-                     IGMP(packet)
-                elif 'UDP' in packet:
-                     UDP(packet)
-                elif 'DNS' in packet:
-                     analyse_generic_protocol(packet, 'DNS')
-                elif 'NBNS' in packet:
-                     analyse_generic_protocol(packet, 'NBNS')
-                elif 'MDNS' in packet:
-                     analyse_generic_protocol(packet, 'MDNS')
-                elif 'LMNR' in packet:
-                     analyse_generic_protocol(packet, 'LMNR')
-
-                
-                
-
-                else:    print("!!!!!!!!!!!!!!!!!!!We dont have that YET!!!!!!!!!!!!!!!!!!!")
-
-            if packet_counter == 0:
-                print("\nNo  packets.")
-           
-
-        except Exception as e:
-            print(f"\nError??: {e}")
-
-
-
-def ARP(packet):
-    print(f"\t Operation: {packet.arp.opcode} {'Request' if packet.arp.opcode == '1' else 'Reply' if packet.arp.opcode == '2' else 'We dont have that operation yet' } \n ")
-    print(f"\t Sender's MAC: {packet.arp.src_hw_mac}")
-    print(f"\t Sender's IP: {packet.arp.src_proto_ipv4} \n")
-
-    print(f"\t Targets's MAC: {packet.arp.dst_hw_mac}")
-    print(f"\t Targets's IP: {packet.arp.dst_proto_ipv4} \n")
-
-    if packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4:
-        print("IT IS GRATITIOUS!")
-
-    
-
-
-def ICMP(packet):
-    
-    Type_map = {
-       "3" : "Destination unreachable",
-       "4" : "Source quench",
-       "11" : "Time Exceeded",
-       "12" : "Parametr problem",
-       "8" : "Echo request",
-       "0" : "Echo reply"
-       }
-
-    Code = {
-        "3" : {"0" : "Net is unreachable",
-               "1" : "Host is unreachable",
-               "2" : "Protocol is unreachable",
-               "3" : "Port is unreachable"},
-        "5" : {"0" : "Redirect datagram for the network",
-               "1" : "Redirect datagram for the host",
-               "2" : "Redirect datagram for the type of service and network",
-               "3" : "Redirect datagram for the type of service and host"},
-        "11" : {"0" : "Time to Live exceeded in transit",
-               "1" : "Fragment reassembly time exceeded"},
-        "12" : {"0" : "Pointer indicates the error",
-               "1" : "Missing a required option",
-               "2" : "Bad length"},
-        "8"  : {"0": "Echo request"},
-        "0"  : {"0": "Echo reply"}
-
-        }
-
-    type_desc = Type_map.get(packet.icmp.type, "Unknown type")
-    
-    code_desc = Code.get(packet.icmp.type, {}).get(packet.icmp.code, "No description for the code")
-
-    print(f"\t Type: {packet.icmp.type} :  {type_desc}")
-    print(f"\t Code: {packet.icmp.code} : {code_desc}")
-    print(f"\t Checksum status: {packet.icmp.checksum_status}")
-    if hasattr(packet, 'icmp'):
-        if hasattr(packet.icmp ,'ident'):
-            print(f"\t Identifier: {packet.icmp.ident} Sequence number: {packet.icmp.seq}")
-
-def IGMP(packet):
-        x = packet.igmp.type
-        if x == '0x11':
-            y = 'Membership Query'
-        elif x in ['0x12','0x16','0x22']:
-            y = 'Membership Report'
-        elif x == '0x17':
-            y = 'Leave group'
-        else: 
-            y = 'We dont have that yet'
-        print(f"\t Type: {packet.igmp.type} : {y}")
-        print(f"\t Checksum Status: {packet.igmp.checksum_status}")
-        print(f"\t Multicast address: {packet.igmp.maddr}")
+def igmp(packet):
+    igmp_type = packet.igmp.type
+    if igmp_type == '0x11':
+        type_desc = 'Membership Query'
+    elif igmp_type in ['0x12','0x16','0x22']:
+        type_desc = 'Membership Report'
+    elif igmp_type == '0x17':
+        type_desc = 'Leave group'
+    else: 
+        type_desc = 'Unknown type'
+        
+    igmp_data = {
+        'protocol': 'IGMP',
+        'type': igmp_type,
+        'type_description': type_desc,
+        'checksum_status': packet.igmp.checksum_status,
+        'multicast_address': packet.igmp.maddr
+    }
+    return igmp_data
        
-        
-
-def TCP(packet):
+def tcp(packet):
+    tcp_data = {
+        'protocol': 'TCP',
+        'src_port': packet.tcp.srcport,
+        'dst_port': packet.tcp.dstport,
+        'flags': packet.tcp.flags.showname
+    }
+    return tcp_data
     
-    print(f"\t Source port: {packet.tcp.srcport}")
-    print(f"\t Destination port: {packet.tcp.dstport}")
-    print(f"\t Flags: {packet.tcp.flags.showname}")
-    
-    
+def udp(packet):
+    udp_data = {
+        'protocol': 'UDP',
+        'src_port': packet.udp.srcport,
+        'dst_port': packet.udp.dstport,
+        'length': packet.udp.length,
+        'checksum_status': packet.udp.checksum_status.showname
+    }
+    return udp_data
 
-def UDP(packet):
-    print(f"\t Source port: {packet.udp.srcport}")
-    print(f"\t Destination port: {packet.udp.dstport}")
-    print(f"\t Length: {packet.udp.length}")
-    print(f"\t  {packet.udp.checksum_status.showname}")
+def eth(packet):
+    eth_data = {
+        'eth_type': packet.eth.type,
+        'src_mac': packet.eth.src,
+        'dst_mac': packet.eth.dst
+    }
+    return eth_data
 
+def generic(packet, name):
 
-def ETH(packet):
-    print(f"Type: {packet.eth.type}")
-
-
-def analyse_generic_protocol(packet, name):
     proto_layer = packet[name.lower()]
-    
-    print(f"\t ID: {proto_layer.id}")
-    print(f"\t Flags: {proto_layer.flags.showname}")
-    print(f"\t Queries count: {proto_layer.count_queries}")
-    print(f"\t Answers count: {proto_layer.count_answers}")
-    
-
+    generic_data = {
+        'protocol': name.upper(),
+        'id': proto_layer.id,
+        'flags': proto_layer.flags.showname,
+        'queries_count': proto_layer.count_queries,
+        'answers_count': proto_layer.count_answers
+    }
+    return generic_data
 
 
 

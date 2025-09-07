@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 import pandas as pd
-import time
+
 
 import file_analyse
 
@@ -14,24 +14,24 @@ pd.set_option('display.max_colwidth', None)
 
 
 
-def extract_arp_data(capture):
+def extract_arp_data(captured_packets):
 
     databaseARP = defaultdict(list)
     founds = 0
     
     try:
         packet_counter = 0
-        for packet in capture:
+        for packet in captured_packets:
             packet_counter += 1
-            if 'ARP' in packet: 
+            if 'ARP' in packet['protocol']: 
                 founds += 1
             
-                databaseARP['Operation'].append(packet.arp.opcode) 
-                databaseARP['Sender\'s IP'].append(packet.arp.src_proto_ipv4) 
-                databaseARP['Sender\'s MAC'].append(packet.arp.src_hw_mac) 
-                databaseARP['Target\'s IP'].append(packet.arp.dst_proto_ipv4) 
-                databaseARP['Target\'s MAC'].append(packet.arp.dst_hw_mac)
-                if packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4:
+                databaseARP['Operation'].append(packet['operation'].split(' ')[0])
+                databaseARP['Sender\'s IP'].append(packet['sender_ip']) 
+                databaseARP['Sender\'s MAC'].append(packet['sender_mac']) 
+                databaseARP['Target\'s IP'].append(packet['target_ip']) 
+                databaseARP['Target\'s MAC'].append(packet['target_mac'])
+                if packet['sender_ip'] == packet['target_ip']:
                     databaseARP['Gratitious?'].append('1')
                 else:
                     databaseARP['Gratitious?'].append('0')
@@ -55,13 +55,15 @@ def extract_arp_data(capture):
 
 
 def check_for_unsolicited_arp(arp_database):
-  
+    
+    issue = False
+
     if not arp_database['Operation']:
         print("No packets")
         return
 
     num_packets = len(arp_database['Operation'])
-
+    
     pending_requests = []
 
     for i in range(num_packets):
@@ -70,7 +72,7 @@ def check_for_unsolicited_arp(arp_database):
         sender_ip = arp_database["Sender's IP"][i]
         target_ip = arp_database["Target's IP"][i]
         is_gratuitous = arp_database['Gratitious?'][i]
-
+        
         if operation == '1': 
             #print(f"Index {i+1}: Request from {sender_ip} to {target_ip}")
             if (sender_ip, target_ip) not in pending_requests:
@@ -86,12 +88,20 @@ def check_for_unsolicited_arp(arp_database):
             else:
                 if is_gratuitous == '1':
                      print(f"Index {i+1}: Gratuitous ARP from {sender_ip}.")
+                     issue = True
                 else:
                      print(f"Index {i+1}: THE RESPONSE WITHOUT REQUEST FROM {sender_ip} TO {target_ip}!")
+                     issue = True
+    if issue == False:
+        print("It's ok")
     #print(pending_requests)
+
+            
     
 
 def detect_arp_spoofing(arp_database):
+    
+    issue = False
 
     if not arp_database.get('Operation'):
         print("No packets")
@@ -116,11 +126,15 @@ def detect_arp_spoofing(arp_database):
                     print(f"IP: {sender_ip}")
                     print(f"Previous MAC: {ip_to_mac[sender_ip]}")
                     print(f"New MAC: {sender_mac}")
+                    issue = True
                     
             else:
                
                 ip_to_mac[sender_ip] = sender_mac
-
+    if issue == False:
+        print("It's ok")
+    
+    
 
 
 
