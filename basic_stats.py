@@ -23,3 +23,8 @@ def count_packets_by_protocol(captured_packets):
        
     for protocol, count in protocol_counter.items():
         print(f"Found protocol (the highest): '{protocol.upper()}': {count} times")
+
+def show_packets(captured_packets, name):
+    for packet in captured_packets:
+        if name in packet['protocol']:
+            print(packet)

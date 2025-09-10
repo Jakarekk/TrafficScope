@@ -10,6 +10,7 @@ print("3. How many particular packets")
 print("4. ARP DATABASE")
 print("5. ARP response without request")
 print("6. ARP address mac change")
+print("7. Show all ... packets")
 
 
 base = capture.capture_to_base()
@@ -37,6 +38,10 @@ while True:
 
     elif x == '6':
         arp_check.detect_arp_spoofing(arp_database)
+    
+    elif x == '7':
+        y = input("Which packet?")
+        basic_stats.show_packets(base, y)
     
 
 
