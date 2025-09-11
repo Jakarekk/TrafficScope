@@ -1,3 +1,4 @@
+from sqlite3.dbapi2 import Timestamp
 import pyshark
 
 import file_analyse
@@ -14,7 +15,7 @@ def capture_to_base():
    
         packet_info = {
             'packet_number': i + 1,
-            'timestamp': packet.sniff_time,
+            
             'length': packet.length
         }
 
@@ -45,6 +46,7 @@ def capture_to_base():
             packet_info['protocol'] = packet.highest_layer
 
         captured_packets.append(packet_info)
+   
 
 
     capture.close()

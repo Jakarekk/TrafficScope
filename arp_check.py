@@ -3,6 +3,7 @@ from collections import defaultdict
 import pandas as pd
 
 
+import capture
 import file_analyse
 
 
@@ -31,12 +32,13 @@ def extract_arp_data(captured_packets):
                 databaseARP['Sender\'s MAC'].append(packet['sender_mac']) 
                 databaseARP['Target\'s IP'].append(packet['target_ip']) 
                 databaseARP['Target\'s MAC'].append(packet['target_mac'])
+                databaseARP['Timestamp'].append(packet['timestamp'])
                 if packet['sender_ip'] == packet['target_ip']:
                     databaseARP['Gratitious?'].append('1')
                 else:
                     databaseARP['Gratitious?'].append('0')
         prop = (founds/packet_counter) * 100
-        if prop > 10 and prop < 20:
+        if prop > 15 and prop < 20:
             print("The amount of ARP is alarming")
         elif prop > 20:
             print("WAY TOU MUCH ARP!!!!")

@@ -4,6 +4,7 @@ import capture
 import basic_stats
 import arp_check
 
+
 print("1. List of all packets")
 print("2. How many packets")
 print("3. How many particular packets")
@@ -11,6 +12,7 @@ print("4. ARP DATABASE")
 print("5. ARP response without request")
 print("6. ARP address mac change")
 print("7. Show all ... packets")
+print("8. Latency")
 
 
 base = capture.capture_to_base()
@@ -19,6 +21,7 @@ arp_database = None
 while True:
    
     x = readchar()
+
     if x == '1':
         print(base)
 
@@ -40,8 +43,11 @@ while True:
         arp_check.detect_arp_spoofing(arp_database)
     
     elif x == '7':
-        y = input("Which packet?")
+        y = input("Which packet?").upper()
         basic_stats.show_packets(base, y)
+
+    elif x == '8':
+        basic_stats.latencies(base)
     
 
 

@@ -25,6 +25,8 @@
     <Compile Include="basic_stats.py" />
     <Compile Include="capture.py" />
     <Compile Include="file_analyse.py" />
+    <Compile Include="latency.py" />
+    <Compile Include="packets_databases.py" />
     <Compile Include="TrafficScope.py" />
   </ItemGroup>
   <ItemGroup>

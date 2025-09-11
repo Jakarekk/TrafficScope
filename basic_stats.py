@@ -1,6 +1,9 @@
 import os
 from collections import Counter
 
+import arp_check
+import latency
+
 
 def count_all_packets(captured_packets):
 
@@ -28,3 +31,28 @@ def show_packets(captured_packets, name):
     for packet in captured_packets:
         if name in packet['protocol']:
             print(packet)
+
+def latencies(captured_packets):
+    arp = latency.latencyARP(captured_packets)
+    print("ARP packet latency statistics:")
+    latency.statistic(arp)
+    
+    #dns = latency.latencyDNS(captured_packets)
+    #print("DNS packet latency statistics:")
+    #latency.statistic(dns)
+    
+    icmp = latency.latencyICMP(captured_packets)
+    print("ICMP packet latency statistics:")
+    latency.statistic(icmp)
+
+    
+       
+
+                
+                 
+
+      
+          
+
+    
+           

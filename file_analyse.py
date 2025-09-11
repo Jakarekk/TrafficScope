@@ -9,7 +9,8 @@ def arp(packet):
         'sender_ip': packet.arp.src_proto_ipv4,
         'target_mac': packet.arp.dst_hw_mac,
         'target_ip': packet.arp.dst_proto_ipv4,
-        'gratuitous': packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4
+        'gratuitous': packet.arp.src_proto_ipv4 == packet.arp.dst_proto_ipv4,
+        'timestamp': packet.sniff_time
     }
     return arp_data
 
@@ -31,7 +32,8 @@ def icmp(packet):
         'type_description': Type_map.get(icmp_type, "Unknown type"),
         'code': icmp_code,
         'code_description': Code_map.get(icmp_type, {}).get(icmp_code, "No description"),
-        'checksum_status': packet.icmp.checksum_status
+        'checksum_status': packet.icmp.checksum_status,
+        'timestamp': packet.sniff_time
     }
     
     if hasattr(packet.icmp, 'ident'):
