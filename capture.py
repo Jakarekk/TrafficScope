@@ -32,13 +32,19 @@ def capture_to_base():
             igmp_details = file_analyse.igmp(packet)
             packet_info.update(igmp_details)
         
-        elif 'TCP' in packet:
-            tcp_details = file_analyse.tcp(packet)
-            packet_info.update(tcp_details)
-        
+        elif 'DNS' in packet:
+            dns_details = file_analyse.generic(packet, 'DNS')
+            packet_info.update(dns_details)
+            
+            
+
         elif 'UDP' in packet:
             udp_details = file_analyse.udp(packet)
             packet_info.update(udp_details)
+          
+        elif 'TCP' in packet:
+            tcp_details = file_analyse.tcp(packet)
+            packet_info.update(tcp_details)
    
     
         else:

@@ -16,7 +16,7 @@ print("8. Latency")
 
 
 base = capture.capture_to_base()
-arp_database = None
+#arp_database = None
 
 while True:
    

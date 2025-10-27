@@ -34,15 +34,15 @@ def show_packets(captured_packets, name):
 
 def latencies(captured_packets):
     arp = latency.latencyARP(captured_packets)
-    print("ARP packet latency statistics:")
+    print("\n\nARP packet latency statistics:")
     latency.statistic(arp)
     
-    #dns = latency.latencyDNS(captured_packets)
-    #print("DNS packet latency statistics:")
-    #latency.statistic(dns)
+    dns = latency.latencyDNS(captured_packets)
+    print("\n\nDNS packet latency statistics:")
+    latency.statistic(dns)
     
     icmp = latency.latencyICMP(captured_packets)
-    print("ICMP packet latency statistics:")
+    print("\n\nICMP packet latency statistics:")
     latency.statistic(icmp)
 
     

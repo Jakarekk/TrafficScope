@@ -1,5 +1,4 @@
 import numpy as np
-
 import arp_check
 import packets_databases
 
@@ -46,7 +45,27 @@ def latencyICMP(captured_packets):
 
 
 def latencyDNS(captured_packets):
-    pass
+    databaseDNS = packets_databases.extract_dns_data(captured_packets)
+    latency = []
+    pending_request = {}
+
+
+    for i in range(len(databaseDNS['id'])):
+        if databaseDNS['is_response'][i] == 'False':
+            pending_request[databaseDNS['id'][i]] = databaseDNS['timestamp'][i]
+        elif databaseDNS['is_response'][i] == 'True' :
+            if databaseDNS['id'][i] in pending_request:
+                response_time = databaseDNS['timestamp'][i]
+                request_time = pending_request[databaseDNS['id'][i]]
+                result = response_time - request_time
+                latency.append(latency_ms([result]))
+                del pending_request[databaseDNS['id'][i]]
+        
+    
+    return latency
+
+
+
 
 def latencyARP(captured_packets):
     databaseARP = arp_check.extract_arp_data(captured_packets)

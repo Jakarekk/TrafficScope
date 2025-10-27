@@ -92,14 +92,22 @@ def eth(packet):
 def generic(packet, name):
 
     proto_layer = packet[name.lower()]
+    
+            
     generic_data = {
         'protocol': name.upper(),
         'id': proto_layer.id,
         'flags': proto_layer.flags.showname,
         'queries_count': proto_layer.count_queries,
-        'answers_count': proto_layer.count_answers
+        'answers_count': proto_layer.count_answers,
+        'timestamp': packet.sniff_time
     }
+    if name.upper() == 'DNS':  
+ 
+     generic_data['is_response'] = proto_layer.flags_response 
+
     return generic_data
+        
 
 
 
